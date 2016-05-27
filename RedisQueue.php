@@ -8,7 +8,7 @@
 namespace yii\queue;
 
 use Predis\Client;
-use Predis\Transaction\MultiExec;
+use Predis\Transaction\MultiExecContext;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -69,7 +69,7 @@ class RedisQueue extends Component implements QueueInterface
     {
         foreach ([':delayed', ':reserved'] as $type) {
             $options = ['cas' => true, 'watch' => $queue . $type];
-            $this->redis->transaction($options, function (MultiExec $transaction) use ($queue, $type) {
+            $this->redis->transaction($options, function (MultiExecContext $transaction) use ($queue, $type) {
                 $data = $this->redis->zrangebyscore($queue . $type, '-inf', $time = time());
 
                 if (!empty($data)) {
